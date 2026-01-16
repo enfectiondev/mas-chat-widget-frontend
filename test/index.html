@@ -1,421 +1,422 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>MAS Full-Screen Chat Widget Test</title>
-		<style>
-			body {
-				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
-					sans-serif;
-				margin: 0;
-				padding: 20px;
-				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-				min-height: 100vh;
-				line-height: 1.6;
-				color: #333;
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>MAS Full-Screen Chat Widget Test</title>
+	<!-- Google Fonts - Prompt -->
+	<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+	<style>
+		body {
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+				sans-serif;
+			margin: 0;
+			padding: 20px;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			min-height: 100vh;
+			line-height: 1.6;
+			color: #333;
+		}
+
+		.container {
+			max-width: 1200px;
+			margin: 0 auto;
+			background: rgba(255, 255, 255, 0.95);
+			padding: 40px;
+			border-radius: 20px;
+			box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+			backdrop-filter: blur(10px);
+		}
+
+		h1 {
+			color: #2d3748;
+			text-align: center;
+			margin-bottom: 30px;
+			font-size: 2.5rem;
+			font-weight: 700;
+		}
+
+		.hero-section {
+			text-align: center;
+			margin-bottom: 50px;
+			padding: 40px;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			border-radius: 15px;
+			color: white;
+		}
+
+		.hero-section h2 {
+			font-size: 2rem;
+			margin-bottom: 15px;
+		}
+
+		.hero-section p {
+			font-size: 1.2rem;
+			opacity: 0.9;
+		}
+
+		.section {
+			margin-bottom: 40px;
+			padding: 30px;
+			border: none;
+			border-radius: 15px;
+			background: rgba(247, 250, 252, 0.8);
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+		}
+
+		.section h3 {
+			color: #2d3748;
+			margin-top: 0;
+			font-size: 1.5rem;
+			font-weight: 600;
+		}
+
+		.feature-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+			gap: 25px;
+			margin: 30px 0;
+		}
+
+		.feature-card {
+			background: white;
+			padding: 25px;
+			border-radius: 12px;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+			border-left: 4px solid #ed1d24;
+		}
+
+		.feature-card h4 {
+			color: #ed1d24;
+			margin-top: 0;
+			font-size: 1.2rem;
+			font-weight: 600;
+		}
+
+		.feature-card p {
+			color: #4a5568;
+			margin-bottom: 0;
+		}
+
+		.demo-area {
+			height: 400px;
+			background: linear-gradient(135deg,
+					#1a365d 0%,
+					#2d3748 50%,
+					#1a202c 100%);
+			color: white;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 24px;
+			border-radius: 15px;
+			margin: 30px 0;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.demo-area::before {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+			animation: float 20s linear infinite;
+		}
+
+		@keyframes float {
+			0% {
+				transform: translateY(0);
 			}
 
+			100% {
+				transform: translateY(-100px);
+			}
+		}
+
+		.demo-content {
+			text-align: center;
+			z-index: 1;
+			position: relative;
+		}
+
+		.demo-content h3 {
+			margin: 0 0 20px 0;
+			font-size: 2rem;
+		}
+
+		.demo-content p {
+			margin: 0 0 15px 0;
+			opacity: 0.9;
+		}
+
+		.status-indicator {
+			display: inline-flex;
+			align-items: center;
+			background: rgba(237, 29, 36, 0.1);
+			color: #ed1d24;
+			padding: 12px 20px;
+			border-radius: 25px;
+			font-weight: 600;
+			margin: 20px 0;
+			border: 2px solid rgba(237, 29, 36, 0.3);
+		}
+
+		.status-indicator::before {
+			content: "🚀";
+			margin-right: 8px;
+		}
+
+		.tech-specs {
+			background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+			padding: 25px;
+			border-radius: 12px;
+			margin: 25px 0;
+		}
+
+		.tech-specs h4 {
+			color: #2d3748;
+			margin-top: 0;
+			font-size: 1.3rem;
+		}
+
+		.tech-list {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			gap: 15px;
+			margin-top: 15px;
+		}
+
+		.tech-item {
+			background: white;
+			padding: 15px;
+			border-radius: 8px;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+			text-align: center;
+			border: 1px solid rgba(237, 29, 36, 0.1);
+		}
+
+		.footer {
+			text-align: center;
+			margin-top: 50px;
+			padding: 30px;
+			color: #4a5568;
+			background: rgba(247, 250, 252, 0.8);
+			border-radius: 15px;
+		}
+
+		@media (max-width: 768px) {
 			.container {
-				max-width: 1200px;
-				margin: 0 auto;
-				background: rgba(255, 255, 255, 0.95);
-				padding: 40px;
-				border-radius: 20px;
-				box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-				backdrop-filter: blur(10px);
-			}
-
-			h1 {
-				color: #2d3748;
-				text-align: center;
-				margin-bottom: 30px;
-				font-size: 2.5rem;
-				font-weight: 700;
-			}
-
-			.hero-section {
-				text-align: center;
-				margin-bottom: 50px;
-				padding: 40px;
-				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-				border-radius: 15px;
-				color: white;
+				padding: 20px;
+				margin: 10px;
 			}
 
 			.hero-section h2 {
-				font-size: 2rem;
-				margin-bottom: 15px;
-			}
-
-			.hero-section p {
-				font-size: 1.2rem;
-				opacity: 0.9;
-			}
-
-			.section {
-				margin-bottom: 40px;
-				padding: 30px;
-				border: none;
-				border-radius: 15px;
-				background: rgba(247, 250, 252, 0.8);
-				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-			}
-
-			.section h3 {
-				color: #2d3748;
-				margin-top: 0;
 				font-size: 1.5rem;
-				font-weight: 600;
-			}
-
-			.feature-grid {
-				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-				gap: 25px;
-				margin: 30px 0;
-			}
-
-			.feature-card {
-				background: white;
-				padding: 25px;
-				border-radius: 12px;
-				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-				border-left: 4px solid #ed1d24;
-			}
-
-			.feature-card h4 {
-				color: #ed1d24;
-				margin-top: 0;
-				font-size: 1.2rem;
-				font-weight: 600;
-			}
-
-			.feature-card p {
-				color: #4a5568;
-				margin-bottom: 0;
 			}
 
 			.demo-area {
-				height: 400px;
-				background: linear-gradient(
-					135deg,
-					#1a365d 0%,
-					#2d3748 50%,
-					#1a202c 100%
-				);
-				color: white;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				font-size: 24px;
-				border-radius: 15px;
-				margin: 30px 0;
-				position: relative;
-				overflow: hidden;
+				height: 300px;
+				font-size: 18px;
 			}
+		}
+	</style>
+</head>
 
-			.demo-area::before {
-				content: "";
-				position: absolute;
-				top: 0;
-				left: 0;
-				right: 0;
-				bottom: 0;
-				background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>')
-					repeat;
-				animation: float 20s linear infinite;
-			}
+<body>
+	<div class="container">
+		<h1>🤖 MAS Full-Screen Chat Widget</h1>
 
-			@keyframes float {
-				0% {
-					transform: translateY(0);
-				}
-				100% {
-					transform: translateY(-100px);
-				}
-			}
-
-			.demo-content {
-				text-align: center;
-				z-index: 1;
-				position: relative;
-			}
-
-			.demo-content h3 {
-				margin: 0 0 20px 0;
-				font-size: 2rem;
-			}
-
-			.demo-content p {
-				margin: 0 0 15px 0;
-				opacity: 0.9;
-			}
-
-			.status-indicator {
-				display: inline-flex;
-				align-items: center;
-				background: rgba(237, 29, 36, 0.1);
-				color: #ed1d24;
-				padding: 12px 20px;
-				border-radius: 25px;
-				font-weight: 600;
-				margin: 20px 0;
-				border: 2px solid rgba(237, 29, 36, 0.3);
-			}
-
-			.status-indicator::before {
-				content: "🚀";
-				margin-right: 8px;
-			}
-
-			.tech-specs {
-				background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
-				padding: 25px;
-				border-radius: 12px;
-				margin: 25px 0;
-			}
-
-			.tech-specs h4 {
-				color: #2d3748;
-				margin-top: 0;
-				font-size: 1.3rem;
-			}
-
-			.tech-list {
-				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-				gap: 15px;
-				margin-top: 15px;
-			}
-
-			.tech-item {
-				background: white;
-				padding: 15px;
-				border-radius: 8px;
-				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-				text-align: center;
-				border: 1px solid rgba(237, 29, 36, 0.1);
-			}
-
-			.footer {
-				text-align: center;
-				margin-top: 50px;
-				padding: 30px;
-				color: #4a5568;
-				background: rgba(247, 250, 252, 0.8);
-				border-radius: 15px;
-			}
-
-			@media (max-width: 768px) {
-				.container {
-					padding: 20px;
-					margin: 10px;
-				}
-
-				.hero-section h2 {
-					font-size: 1.5rem;
-				}
-
-				.demo-area {
-					height: 300px;
-					font-size: 18px;
-				}
-			}
-		</style>
-	</head>
-	<body>
-		<div class="container">
-			<h1>🤖 MAS Full-Screen Chat Widget</h1>
-
-			<div class="hero-section">
-				<h2>Next-Generation Chat Experience</h2>
-				<p>
-					Immersive full-screen chat with WebGL particle animations and modern
-					UX design
-				</p>
-				<div class="status-indicator">
-					Widget Loaded & Ready - Look for the red floating particles in
-					bottom-right!
-				</div>
-			</div>
-
-			<div class="section">
-				<h3>🎯 Key Features</h3>
-				<div class="feature-grid">
-					<div class="feature-card">
-						<h4>🎇 WebGL Animated Button</h4>
-						<p>
-							Red floating particles with smooth hover transitions to
-							pink/magenta
-						</p>
-					</div>
-					<div class="feature-card">
-						<h4>🌟 Full-Screen Experience</h4>
-						<p>Takes entire browser window for immersive chat experience</p>
-					</div>
-					<div class="feature-card">
-						<h4>🎨 Modern Light UI Design</h4>
-						<p>
-							Clean light grayish background with circular icon header,
-							timestamps, and audio controls
-						</p>
-					</div>
-					<div class="feature-card">
-						<h4>🚀 Smart Input Flow</h4>
-						<p>
-							Input starts at bottom, smoothly transitions to show chat messages
-							after first message
-						</p>
-					</div>
-					<div class="feature-card">
-						<h4>💾 Chat Persistence</h4>
-						<p>
-							Chat history saved in localStorage - survives popup close/reopen
-						</p>
-					</div>
-					<div class="feature-card">
-						<h4>📱 Mobile Optimized</h4>
-						<p>Responsive design that works perfectly on all devices</p>
-					</div>
-				</div>
-			</div>
-
-			<div class="section">
-				<h3>🧪 How to Test</h3>
-				<ol style="font-size: 1.1rem; line-height: 1.8">
-					<li>
-						<strong>Look for the animated chat button</strong> - Red floating
-						particles in bottom-right corner
-					</li>
-					<li>
-						<strong>Click the particles</strong> - Full-screen chat overlay will
-						appear
-					</li>
-					<li>
-						<strong>Notice the design</strong> - Light grayish background with
-						circular red icon in header and modern UI
-					</li>
-					<li>
-						<strong>See the input flow</strong> - Input starts prominently at
-						bottom
-					</li>
-					<li>
-						<strong>Send a message</strong> - Watch smooth transition as chat
-						area expands
-					</li>
-					<li>
-						<strong>Test persistence</strong> - Close popup and reopen to see
-						chat history preserved
-					</li>
-				</ol>
-			</div>
-
-			<div class="demo-area">
-				<div class="demo-content">
-					<h3>Interactive Demo Area</h3>
-					<p>
-						Click the floating particle button to experience the full-screen
-						chat!
-					</p>
-					<div style="font-size: 16px; opacity: 0.8; margin-top: 20px">
-						<strong>Popup Mode:</strong> Opens as popup with full-screen
-						toggle<br />
-						<strong>UI:</strong> Light gray background with timestamps & audio
-						controls<br />
-						<strong>Features:</strong> Microphone icon, circular header icon,
-						modern design
-					</div>
-				</div>
-			</div>
-
-			<div class="section">
-				<div class="tech-specs">
-					<h4>⚙️ Technical Specifications</h4>
-					<div class="tech-list">
-						<div class="tech-item">
-							<strong>React 19</strong><br />
-							<small>Modern UI Framework</small>
-						</div>
-						<div class="tech-item">
-							<strong>SASS/SCSS</strong><br />
-							<small>Modern Styling</small>
-						</div>
-						<div class="tech-item">
-							<strong>Framer Motion</strong><br />
-							<small>Smooth Transitions</small>
-						</div>
-						<div class="tech-item">
-							<strong>Webpack 5</strong><br />
-							<small>Module Bundling</small>
-						</div>
-						<div class="tech-item">
-							<strong>~892KB</strong><br />
-							<small>Bundle Size</small>
-						</div>
-						<div class="tech-item">
-							<strong>ES6+</strong><br />
-							<small>Modern JavaScript</small>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<div class="footer">
-				<p><strong>🔬 Development Environment</strong></p>
-				<p>Full-Screen Chat Widget Integration Testing</p>
-				<p style="margin-top: 20px">
-					<small
-						>Make sure to test on different screen sizes and browsers for
-						optimal experience!</small
-					>
-				</p>
+		<div class="hero-section">
+			<h2>Next-Generation Chat Experience</h2>
+			<p>
+				Immersive full-screen chat with WebGL particle animations and modern
+				UX design
+			</p>
+			<div class="status-indicator">
+				Widget Loaded & Ready - Look for the red floating particles in
+				bottom-right!
 			</div>
 		</div>
 
-		<!-- Load MAS Full-Screen Chat Widget with Cache Busting -->
-		<script>
-			// Add cache-busting timestamp to ensure latest version loads
-			const script = document.createElement("script");
-			script.src = `../dist/chat-widget.js?v=${Date.now()}`;
-			document.head.appendChild(script);
-		</script>
+		<div class="section">
+			<h3>🎯 Key Features</h3>
+			<div class="feature-grid">
+				<div class="feature-card">
+					<h4>🎇 WebGL Animated Button</h4>
+					<p>
+						Red floating particles with smooth hover transitions to
+						pink/magenta
+					</p>
+				</div>
+				<div class="feature-card">
+					<h4>🌟 Full-Screen Experience</h4>
+					<p>Takes entire browser window for immersive chat experience</p>
+				</div>
+				<div class="feature-card">
+					<h4>🎨 Modern Light UI Design</h4>
+					<p>
+						Clean light grayish background with circular icon header,
+						timestamps, and audio controls
+					</p>
+				</div>
+				<div class="feature-card">
+					<h4>🚀 Smart Input Flow</h4>
+					<p>
+						Input starts at bottom, smoothly transitions to show chat messages
+						after first message
+					</p>
+				</div>
+				<div class="feature-card">
+					<h4>💾 Chat Persistence</h4>
+					<p>
+						Chat history saved in localStorage - survives popup close/reopen
+					</p>
+				</div>
+				<div class="feature-card">
+					<h4>📱 Mobile Optimized</h4>
+					<p>Responsive design that works perfectly on all devices</p>
+				</div>
+			</div>
+		</div>
 
-		<!-- Analytics & Debug -->
-		<script>
-			// Log when page loads
-			window.addEventListener("load", function () {
-				console.log("🚀 MAS Full-Screen Chat Widget Test Page loaded!");
-				console.log("📦 Chat widget should be initialized");
+		<div class="section">
+			<h3>🧪 How to Test</h3>
+			<ol style="font-size: 1.1rem; line-height: 1.8">
+				<li>
+					<strong>Look for the animated chat button</strong> - Red floating
+					particles in bottom-right corner
+				</li>
+				<li>
+					<strong>Click the particles</strong> - Full-screen chat overlay will
+					appear
+				</li>
+				<li>
+					<strong>Notice the design</strong> - Light grayish background with
+					circular red icon in header and modern UI
+				</li>
+				<li>
+					<strong>See the input flow</strong> - Input starts prominently at
+					bottom
+				</li>
+				<li>
+					<strong>Send a message</strong> - Watch smooth transition as chat
+					area expands
+				</li>
+				<li>
+					<strong>Test persistence</strong> - Close popup and reopen to see
+					chat history preserved
+				</li>
+			</ol>
+		</div>
+
+		<div class="demo-area">
+			<div class="demo-content">
+				<h3>Interactive Demo Area</h3>
+				<p>
+					Click the floating particle button to experience the full-screen
+					chat!
+				</p>
+				<div style="font-size: 16px; opacity: 0.8; margin-top: 20px">
+					<strong>Popup Mode:</strong> Opens as popup with full-screen
+					toggle<br />
+					<strong>UI:</strong> Light gray background with timestamps & audio
+					controls<br />
+					<strong>Features:</strong> Microphone icon, circular header icon,
+					modern design
+				</div>
+			</div>
+		</div>
+
+		<div class="section">
+			<div class="tech-specs">
+				<h4>⚙️ Technical Specifications</h4>
+				<div class="tech-list">
+					<div class="tech-item">
+						<strong>React 19</strong><br />
+						<small>Modern UI Framework</small>
+					</div>
+					<div class="tech-item">
+						<strong>SASS/SCSS</strong><br />
+						<small>Modern Styling</small>
+					</div>
+					<div class="tech-item">
+						<strong>Framer Motion</strong><br />
+						<small>Smooth Transitions</small>
+					</div>
+					<div class="tech-item">
+						<strong>Webpack 5</strong><br />
+						<small>Module Bundling</small>
+					</div>
+					<div class="tech-item">
+						<strong>~892KB</strong><br />
+						<small>Bundle Size</small>
+					</div>
+					<div class="tech-item">
+						<strong>ES6+</strong><br />
+						<small>Modern JavaScript</small>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="footer">
+			<p><strong>🔬 Development Environment</strong></p>
+			<p>Full-Screen Chat Widget Integration Testing</p>
+			<p style="margin-top: 20px">
+				<small>Make sure to test on different screen sizes and browsers for
+					optimal experience!</small>
+			</p>
+		</div>
+	</div>
+
+	<!-- Load MAS Full-Screen Chat Widget with Cache Busting -->
+	<script>
+		// Add cache-busting timestamp to ensure latest version loads
+		const script = document.createElement("script");
+		script.src = `../dist/chat-widget.js?v=${Date.now()}`;
+		document.head.appendChild(script);
+	</script>
+
+	<!-- Analytics & Debug -->
+	<script>
+		// Log when page loads
+		window.addEventListener("load", function () {
+			console.log("🚀 MAS Full-Screen Chat Widget Test Page loaded!");
+			console.log("📦 Chat widget should be initialized");
+			console.log(
+				"🔍 Look for red floating particles in bottom-right corner"
+			);
+			console.log("🎯 Click particles to open full-screen chat experience");
+			console.log(
+				"💡 If you don't see changes, do a hard refresh: Cmd+Shift+R (Mac) or Ctrl+Shift+R (Windows)"
+			);
+		});
+
+		// Error handling
+		window.addEventListener("error", function (e) {
+			console.error("❌ Error loading widget:", e.error);
+		});
+
+		// Widget detection
+		setTimeout(() => {
+			const widgetContainer = document.getElementById(
+				"mas-widget-fullscreen-container"
+			);
+			if (widgetContainer) {
 				console.log(
-					"🔍 Look for red floating particles in bottom-right corner"
+					"✅ Widget container found - Chat widget loaded successfully!"
 				);
-				console.log("🎯 Click particles to open full-screen chat experience");
-				console.log(
-					"💡 If you don't see changes, do a hard refresh: Cmd+Shift+R (Mac) or Ctrl+Shift+R (Windows)"
+			} else {
+				console.warn(
+					"⚠️ Widget container not found - Check for build/loading issues"
 				);
-			});
+			}
+		}, 1000);
+	</script>
+</body>
 
-			// Error handling
-			window.addEventListener("error", function (e) {
-				console.error("❌ Error loading widget:", e.error);
-			});
-
-			// Widget detection
-			setTimeout(() => {
-				const widgetContainer = document.getElementById(
-					"mas-widget-fullscreen-container"
-				);
-				if (widgetContainer) {
-					console.log(
-						"✅ Widget container found - Chat widget loaded successfully!"
-					);
-				} else {
-					console.warn(
-						"⚠️ Widget container not found - Check for build/loading issues"
-					);
-				}
-			}, 1000);
-		</script>
-	</body>
 </html>

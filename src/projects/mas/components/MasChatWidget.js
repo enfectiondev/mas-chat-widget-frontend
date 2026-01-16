@@ -27,7 +27,7 @@ const CHAT_STORAGE_KEY = "mas_chat_messages";
 const DISPLAY_MODE_STORAGE_KEY = "mas_display_mode";
 const DEFAULT_SESSION_ID = Date.now();
 // Replace with your MAS API endpoint
-const MAS_API = "https://api.mas.com/chatbot"; // Update this with your actual MAS API
+const MAS_API = "https://mas-chatbot-app-afhjfeerd9emd8hc.southeastasia-01.azurewebsites.net/chat"; // Update this with your actual MAS API
 
 const MasChatWidget = ({ displayMode = "popup" }) => {
 	// Load saved display mode from localStorage or use default

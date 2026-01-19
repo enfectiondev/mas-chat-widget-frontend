@@ -754,7 +754,22 @@ const MasChatWidget = ({ displayMode = "popup" }) => {
 										<div key={index} className="mas-chat-message-wrapper">
 											<div className={`mas-chat-message ${msg.sender}`}>
 								{msg.sender === "bot" ? (
-									<ReactMarkdown>{msg.text}</ReactMarkdown>
+									<ReactMarkdown
+										components={{
+											p: ({node, ...props}) => <p className="mas-markdown-paragraph" {...props} />,
+											strong: ({node, ...props}) => <strong className="mas-markdown-strong" {...props} />,
+											em: ({node, ...props}) => <em className="mas-markdown-em" {...props} />,
+											ul: ({node, ...props}) => <ul className="mas-markdown-ul" {...props} />,
+											ol: ({node, ...props}) => <ol className="mas-markdown-ol" {...props} />,
+											li: ({node, ...props}) => <li className="mas-markdown-li" {...props} />,
+											br: () => <br className="mas-markdown-br" />,
+										}}
+									>
+										{msg.text
+											.replace(/\n\n+/g, '\n\n') // Normalize multiple newlines to double
+											.replace(/\n(?!\n)/g, '  \n') // Single newline becomes markdown line break (two spaces + newline)
+										}
+									</ReactMarkdown>
 								) : (
 									msg.text
 								)}

@@ -836,6 +836,138 @@ $white-95: rgba(255, 255, 255, 0.95);
 		border-bottom-left-radius: 4px;
 		align-self: flex-start;
 		border: 1px solid rgba(0, 0, 0, 0.05);
+
+		// Enhanced Markdown styling within bot messages
+		.mas-markdown-paragraph {
+			margin: 0 0 12px 0;
+			line-height: 1.7;
+			color: #333;
+			font-size: 14px;
+			
+			&:last-child {
+				margin-bottom: 0;
+			}
+			
+			&:first-child {
+				margin-top: 0;
+			}
+		}
+
+		.mas-markdown-strong {
+			font-weight: 700;
+			color: #1a1a1a;
+			background: linear-gradient(135deg, rgba(237, 29, 36, 0.1) 0%, rgba(237, 29, 36, 0.05) 100%);
+			padding: 2px 4px;
+			border-radius: 3px;
+			display: inline-block;
+		}
+
+		.mas-markdown-em {
+			font-style: italic;
+			color: #555;
+		}
+
+		.mas-markdown-ul {
+			margin: 10px 0;
+			padding-left: 24px;
+			list-style: none;
+			position: relative;
+			
+			&::before {
+				content: '';
+				position: absolute;
+				left: 8px;
+				top: 0;
+				bottom: 0;
+				width: 2px;
+				background: linear-gradient(180deg, rgba(237, 29, 36, 0.3) 0%, rgba(237, 29, 36, 0.1) 100%);
+				border-radius: 2px;
+			}
+		}
+
+		.mas-markdown-ol {
+			margin: 10px 0;
+			padding-left: 24px;
+			list-style-type: decimal;
+			
+			.mas-markdown-li {
+				position: relative;
+				padding-left: 8px;
+				margin-bottom: 6px;
+				line-height: 1.7;
+				color: #444;
+				
+				&::marker {
+					font-weight: 600;
+					color: rgba(237, 29, 36, 0.8);
+				}
+			}
+		}
+
+		.mas-markdown-li {
+			margin-bottom: 6px;
+			line-height: 1.7;
+			color: #444;
+			position: relative;
+			
+			// Nested lists
+			.mas-markdown-ul,
+			.mas-markdown-ol {
+				margin-top: 6px;
+				margin-bottom: 6px;
+				padding-left: 20px;
+			}
+		}
+		
+		// Style list items within unordered lists (custom bullets)
+		.mas-markdown-ul .mas-markdown-li {
+			padding-left: 16px;
+			
+			&::before {
+				content: '•';
+				position: absolute;
+				left: 0;
+				color: rgba(237, 29, 36, 0.7);
+				font-weight: bold;
+				font-size: 16px;
+				line-height: 1.4;
+			}
+			
+			// Nested ul items
+			.mas-markdown-ul .mas-markdown-li {
+				margin-bottom: 4px;
+				font-size: 13px;
+				color: #555;
+				
+				&::before {
+					content: '◦';
+					font-size: 14px;
+					color: rgba(237, 29, 36, 0.5);
+				}
+			}
+		}
+
+		.mas-markdown-br {
+			line-height: 1.7;
+		}
+		
+		// Additional styling for better readability
+		code {
+			background: rgba(0, 0, 0, 0.05);
+			padding: 2px 6px;
+			border-radius: 3px;
+			font-family: 'Courier New', monospace;
+			font-size: 13px;
+			color: #d63384;
+		}
+		
+		blockquote {
+			border-left: 3px solid rgba(237, 29, 36, 0.5);
+			padding-left: 12px;
+			margin: 10px 0;
+			color: #555;
+			font-style: italic;
+		}
 	}
 }
 

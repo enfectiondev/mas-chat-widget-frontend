@@ -255,34 +255,56 @@ const MasChatWidget = ({ displayMode = "popup" }) => {
 		try {
 			// Get API base URL
 			const apiBaseUrl = getApiBaseUrl();
+			console.log("🔍 API Base URL:", apiBaseUrl);
+			
 			if (!apiBaseUrl || apiBaseUrl.trim() === "") {
-				throw new Error("API base URL not configured. Please check your .env file.");
+				throw new Error("API base URL not configured. Please check your .env file and rebuild the project.");
 			}
 
-			// Make API call to custom endpoint
+			// Build chat history from previous messages
+			// Convert messages to chat_history format for the API
+			const chatHistory = messages
+				.filter(msg => msg.sender === "user" || msg.sender === "bot")
+				.map(msg => ({
+					role: msg.sender === "user" ? "user" : "assistant",
+					content: msg.text
+				}));
+
+			const requestBody = {
+				query: messageText,
+				chat_history: chatHistory,
+			};
+
+			console.log("📤 Sending request to:", `${apiBaseUrl}/chat`);
+			console.log("📤 Request body:", JSON.stringify(requestBody, null, 2));
+
+			// Make API call to chatbot endpoint
 			const response = await fetch(`${apiBaseUrl}/chat`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({
-					message: messageText,
-					session_id: sessionId.current,
-				}),
+				body: JSON.stringify(requestBody),
 			});
 
+			console.log("📥 Response status:", response.status, response.statusText);
+
 			if (!response.ok) {
-				throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+				const errorText = await response.text();
+				console.error("❌ API Error Response:", errorText);
+				throw new Error(`API request failed: ${response.status} ${response.statusText}. ${errorText}`);
 			}
 
 			const data = await response.json();
+			console.log("✅ API Response:", data);
 
-			// Parse custom API response format
+			// Parse API response format
+			// Try multiple possible response fields (response, message, content, answer)
 			const botResponse = {
-				text: data.content || "I'm sorry, I couldn't process that request.",
+				text: data.response || data.message || data.content || data.answer || "I'm sorry, I couldn't process that request.",
 				sender: "bot",
 				timestamp: data.timestamp ? formatTime(new Date(data.timestamp)) : formatTime(),
-				agentUsed: data.agent_used || "general",
+				agentUsed: data.agent_used || data.agent || "general",
 				id: `msg-${Date.now()}-${Math.random()}`, // Unique ID for audio playback
 			};
 
@@ -291,9 +313,26 @@ const MasChatWidget = ({ displayMode = "popup" }) => {
 			saveMessages(newMessages);
 			setLoading(false);
 		} catch (error) {
-			console.error("Error sending message:", error);
+			console.error("❌ Error sending message:", error);
+			console.error("❌ Error details:", {
+				message: error.message,
+				stack: error.stack,
+				name: error.name
+			});
+			
+			// Show more helpful error message
+			let errorText = `Thank you for your message. We're experiencing technical difficulties, but your message "${messageText}" has been received. Our team will get back to you soon.`;
+			
+			if (error.message.includes("API base URL not configured")) {
+				errorText = "API configuration error: Please check your .env file and rebuild the project.";
+			} else if (error.message.includes("CORS") || error.message.includes("Failed to fetch")) {
+				errorText = "Network error: Unable to connect to the chatbot API. This might be a CORS issue. Please check the browser console for details.";
+			} else if (error.message.includes("API request failed")) {
+				errorText = `API Error: ${error.message}`;
+			}
+			
 			const errorMsg = {
-				text: `Thank you for your message. We're experiencing technical difficulties, but your message "${messageText}" has been received. Our team will get back to you soon.`,
+				text: errorText,
 				sender: "bot",
 				timestamp: formatTime(),
 				id: `msg-${Date.now()}-${Math.random()}`,

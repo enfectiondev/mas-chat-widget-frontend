@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import * as THREE from "three";
 
-const AnimatedHeaderIcon = ({ size = 32 }) => {
+const AnimatedHeaderIcon = ({ size = 32, eyeSize = 4, eyeGap = 4, opacity = 0.9, particleSizeMin = 0.005, particleSizeMax = 0.04 }) => {
 	const canvasRef = useRef();
 	const containerRef = useRef();
 	const worldRef = useRef();
@@ -96,7 +96,8 @@ const AnimatedHeaderIcon = ({ size = 32 }) => {
     `;
 
 		function getCSSColor() {
-			return parseInt("#ED1D24".replace("#", "0x"));
+			// Use a brighter, more saturated red for better visibility
+			return parseInt("#FF1D24".replace("#", "0x")); // Brighter red
 		}
 
 		class Molecule extends THREE.Object3D {
@@ -105,11 +106,17 @@ const AnimatedHeaderIcon = ({ size = 32 }) => {
 			mesh;
 			radius = 1.5;
 			detail = 20;
-			particleSizeMin = 0.005;
-			particleSizeMax = 0.04;
+			particleSizeMin;
+			particleSizeMax;
+			opacity;
+			dpr;
 
-			constructor() {
+			constructor(particleSizeMin, particleSizeMax, opacity, dpr) {
 				super();
+				this.particleSizeMin = particleSizeMin;
+				this.particleSizeMax = particleSizeMax;
+				this.opacity = opacity;
+				this.dpr = dpr;
 				this.build();
 			}
 
@@ -118,13 +125,13 @@ const AnimatedHeaderIcon = ({ size = 32 }) => {
 
 				this.material = new THREE.PointsMaterial({
 					map: this.dot(),
-					blending: THREE.NormalBlending,
+					blending: THREE.NormalBlending, // Keep NormalBlending for accurate color
 					color: getCSSColor(),
 					depthTest: false,
 					depthWrite: false,
 					transparent: true,
-					alphaTest: 0.05,
-					opacity: 0.9,
+					alphaTest: 0.01, // Lower threshold for better particle visibility
+					opacity: Math.min(this.opacity * 1.2, 1.0), // Slightly increase opacity for brightness
 					vertexColors: false,
 					sizeAttenuation: true,
 				});
@@ -153,12 +160,14 @@ const AnimatedHeaderIcon = ({ size = 32 }) => {
 					sizeH,
 					sizeH
 				);
+				// Make the gradient brighter and more opaque for better visibility
 				gradient.addColorStop(0, color);
-				gradient.addColorStop(0.7, color);
+				gradient.addColorStop(0.5, color);
+				gradient.addColorStop(0.8, color);
 				gradient.addColorStop(1, "transparent");
 
 				const circle = new Path2D();
-				circle.arc(sizeH, sizeH, sizeH * 0.8, 0, 2 * Math.PI);
+				circle.arc(sizeH, sizeH, sizeH * 0.9, 0, 2 * Math.PI); // Slightly larger radius
 
 				ctx.fillStyle = gradient;
 				ctx.fill(circle);
@@ -175,12 +184,14 @@ const AnimatedHeaderIcon = ({ size = 32 }) => {
 					shader.uniforms.radius = { value: this.radius };
 					shader.uniforms.particleSizeMin = { value: this.particleSizeMin };
 					shader.uniforms.particleSizeMax = { value: this.particleSizeMax };
+					shader.uniforms.dpr = { value: this.dpr };
 					shader.vertexShader =
 						"uniform float particleSizeMax;\n" + shader.vertexShader;
 					shader.vertexShader =
 						"uniform float particleSizeMin;\n" + shader.vertexShader;
 					shader.vertexShader = "uniform float radius;\n" + shader.vertexShader;
 					shader.vertexShader = "uniform float time;\n" + shader.vertexShader;
+					shader.vertexShader = "uniform float dpr;\n" + shader.vertexShader;
 					shader.vertexShader = noiseShader + "\n" + shader.vertexShader;
 					shader.vertexShader = shader.vertexShader.replace(
 						"#include <begin_vertex>",
@@ -197,7 +208,7 @@ const AnimatedHeaderIcon = ({ size = 32 }) => {
 					);
 					shader.vertexShader = shader.vertexShader.replace(
 						"gl_PointSize = size;",
-						"gl_PointSize = s;"
+						"gl_PointSize = s * dpr;"
 					);
 
 					material.userData.shader = shader;
@@ -216,10 +227,16 @@ const AnimatedHeaderIcon = ({ size = 32 }) => {
 			scene;
 			camera;
 			molecule;
+			opacity;
+			particleSizeMin;
+			particleSizeMax;
 
-			constructor(container, iconSize) {
+			constructor(container, iconSize, opacity, particleSizeMin, particleSizeMax) {
 				this.container = container;
 				this.iconSize = iconSize;
+				this.opacity = opacity;
+				this.particleSizeMin = particleSizeMin;
+				this.particleSizeMax = particleSizeMax;
 				this.build();
 				this.animate = this.animate.bind(this);
 				this.animate();
@@ -232,6 +249,15 @@ const AnimatedHeaderIcon = ({ size = 32 }) => {
 				this.camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
 				this.camera.position.z = 3;
 
+				// Use full DPR but apply scaling factor for better mobile visibility
+				const rawDpr = window.devicePixelRatio || 1;
+				// Detect mobile devices and apply additional scaling
+				const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+				                 (window.innerWidth <= 768);
+				// Scale factor: 1.5x for mobile to compensate for smaller perceived size
+				const scaleFactor = isMobile ? 1.5 : 1.0;
+				const dpr = rawDpr * scaleFactor;
+
 				this.renderer = new THREE.WebGLRenderer({
 					alpha: true,
 					antialias: true,
@@ -242,18 +268,26 @@ const AnimatedHeaderIcon = ({ size = 32 }) => {
 				this.renderer.setClearColor(0x000000, 0);
 				this.renderer.sortObjects = false;
 				this.renderer.autoClear = true;
-				this.renderer.setPixelRatio(window.devicePixelRatio);
+				// Use raw DPR for renderer, but pass scaled DPR to shader
+				this.renderer.setPixelRatio(rawDpr);
 				this.renderer.setSize(this.iconSize, this.iconSize);
 
-				this.renderer.domElement.style.background = "none";
-				this.renderer.domElement.style.backgroundColor = "transparent";
-				this.renderer.domElement.style.border = "none";
-				this.renderer.domElement.style.outline = "none";
-				this.renderer.domElement.style.boxShadow = "none";
+				// Ensure canvas display size matches the icon size exactly
+				const canvas = this.renderer.domElement;
+				canvas.style.width = `${this.iconSize}px`;
+				canvas.style.height = `${this.iconSize}px`;
+				canvas.style.background = "none";
+				canvas.style.backgroundColor = "transparent";
+				canvas.style.border = "none";
+				canvas.style.outline = "none";
+				canvas.style.boxShadow = "none";
+				// Prevent any CSS filters that might darken the canvas
+				canvas.style.filter = "none";
+				canvas.style.imageRendering = "auto";
 
-				this.container.appendChild(this.renderer.domElement);
+				this.container.appendChild(canvas);
 
-				this.molecule = new Molecule();
+				this.molecule = new Molecule(this.particleSizeMin, this.particleSizeMax, this.opacity, dpr);
 				this.scene.add(this.molecule);
 			}
 
@@ -281,7 +315,7 @@ const AnimatedHeaderIcon = ({ size = 32 }) => {
 			}
 		}
 
-		worldRef.current = new World(canvasRef.current, size);
+		worldRef.current = new World(canvasRef.current, size, opacity, particleSizeMin, particleSizeMax);
 
 		return () => {
 			if (worldRef.current) {
@@ -393,18 +427,18 @@ const AnimatedHeaderIcon = ({ size = 32 }) => {
 					left: "50%",
 					transform: "translate(-50%, -50%)",
 					display: "flex",
-					gap: "4px",
+					gap: `${eyeGap}px`,
 					pointerEvents: "none",
 					zIndex: 1,
 				}}
 			>
 				<div
 					style={{
-						width: "4px",
-						height: "4px",
+						width: `${eyeSize}px`,
+						height: `${eyeSize}px`,
 						background: "white",
 						borderRadius: "50%",
-						boxShadow: "0 0 3px rgba(255, 255, 255, 0.8)",
+						boxShadow: "0 0 4px rgba(255, 255, 255, 0.8)",
 						transform: `translate(${eyePosition.left?.x || 0}px, ${eyePosition.left?.y || 0}px) scaleY(${isBlinking ? 0 : 1})`,
 						transition: "transform 0.15s ease-out",
 						transformOrigin: "center",
@@ -412,11 +446,11 @@ const AnimatedHeaderIcon = ({ size = 32 }) => {
 				/>
 				<div
 					style={{
-						width: "4px",
-						height: "4px",
+						width: `${eyeSize}px`,
+						height: `${eyeSize}px`,
 						background: "white",
 						borderRadius: "50%",
-						boxShadow: "0 0 3px rgba(255, 255, 255, 0.8)",
+						boxShadow: "0 0 4px rgba(255, 255, 255, 0.8)",
 						transform: `translate(${eyePosition.right?.x || 0}px, ${eyePosition.right?.y || 0}px) scaleY(${isBlinking ? 0 : 1})`,
 						transition: "transform 0.15s ease-out",
 						transformOrigin: "center",

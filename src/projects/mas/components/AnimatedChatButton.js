@@ -111,12 +111,12 @@ const AnimatedChatButton = ({ onClick, isVisible = true }) => {
 
 		// Function to get CSS variable colors - with hover support
 		function getCSSColor(variable, isHover = false) {
-			// Using the new red color with hover variants
+			// Using dark red color with hover variants
 			const colors = {
-				"--primary-color": isHover ? "#b30f59" : "#ED1D24", // Pink on hover, red normally
-				"--secondary-color": "#b30f59",
+				"--primary-color": isHover ? "#8B0000" : "#8B0000", // Dark red
+				"--secondary-color": "#8B0000",
 			};
-			const color = colors[variable] || (isHover ? "#b30f59" : "#ED1D24");
+			const color = colors[variable] || (isHover ? "#8B0000" : "#8B0000");
 			return parseInt(color.replace("#", "0x"));
 		}
 
@@ -331,7 +331,7 @@ const AnimatedChatButton = ({ onClick, isVisible = true }) => {
 			// Method to handle hover state change
 			setHoverState(isHovered) {
 				if (this.molecule) {
-					const targetColorHex = isHovered ? "#b30f59" : "#ED1D24";
+					const targetColorHex = isHovered ? "#6B0000" : "#8B0000"; // Dark red, darker on hover
 					this.molecule.transitionToColor(targetColorHex, 0.3);
 				}
 			}

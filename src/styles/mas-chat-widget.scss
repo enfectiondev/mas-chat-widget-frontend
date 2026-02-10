@@ -836,6 +836,8 @@ $white-95: rgba(255, 255, 255, 0.95);
 		border-bottom-left-radius: 4px;
 		align-self: flex-start;
 		border: 1px solid rgba(0, 0, 0, 0.05);
+		position: relative; // For positioning the speech bubble icon
+		position: relative; // For positioning the speech bubble icon
 
 		// Enhanced Markdown styling within bot messages
 		.mas-markdown-paragraph {
@@ -1271,25 +1273,40 @@ $white-95: rgba(255, 255, 255, 0.95);
 	}
 }
 
-// Floating Overlay (default show with button) - Dark Glassmorphism
+// Floating Overlay (default show with button) - Dark Glassmorphism with Speech Bubble Shape
 .mas-floating-overlay {
 	position: fixed;
-	bottom: 150px;
+	bottom: 120px;
 	right: 20px;
 	width: 450px;
 	background: rgba(0, 0, 0, 0.4);
 	backdrop-filter: blur(20px) saturate(180%);
 	-webkit-backdrop-filter: blur(20px) saturate(180%);
 	border-radius: 20px;
-	border: 1px solid rgba(255, 255, 255, 0.18);
+	border: 2px solid rgba(0, 0, 0, 0.2);
 	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
 	z-index: 9998;
-	overflow: hidden;
+	overflow: visible;
+	
+	// Add speech bubble tail/pointer pointing down-right
+	&::after {
+		content: "";
+		position: absolute;
+		bottom: -20px;
+		right: 22px;
+		width: 0;
+		height: 0;
+		border-left: 20px solid rgba(0, 0, 0, 0);
+		border-right: 20px solid rgba(0, 0, 0, 0);
+		border-top: 20px solid rgba(0, 0, 0, 0.4);
+		filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+	}
 }
 
 .mas-floating-content {
 	padding: 28px 24px 24px;
 	text-align: center;
+	position: relative;
 }
 
 .mas-floating-title {
@@ -1358,6 +1375,7 @@ $white-95: rgba(255, 255, 255, 0.95);
 		}
 	}
 }
+
 
 // Responsive Design
 @media (max-width: 768px) {

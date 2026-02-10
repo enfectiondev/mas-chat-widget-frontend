@@ -123,3 +123,78 @@ export const getApiBaseUrl = () => {
 	return "";
 };
 
+/**
+ * Gets the Azure OpenAI endpoint from environment
+ * @returns {string} - The Azure endpoint URL
+ */
+export const getAzureEndpoint = () => {
+	// eslint-disable-next-line no-undef
+	const endpoint = process.env.AZURE_ENDPOINT;
+	
+	if (endpoint && typeof endpoint === "string" && endpoint.trim() !== "" && endpoint !== "undefined") {
+		return endpoint.trim().replace(/\/$/, ""); // Remove trailing slash
+	}
+	
+	if (typeof window !== "undefined" && window.ENV && window.ENV.AZURE_ENDPOINT) {
+		return window.ENV.AZURE_ENDPOINT.trim().replace(/\/$/, "");
+	}
+	
+	console.warn("Azure endpoint not found. Please configure it in .env file and rebuild.");
+	return "";
+};
+
+/**
+ * Gets the Azure API version from environment
+ * @returns {string} - The Azure API version
+ */
+export const getAzureApiVersion = () => {
+	// eslint-disable-next-line no-undef
+	const version = process.env.AZURE_API_VERSION;
+	
+	if (version && typeof version === "string" && version.trim() !== "" && version !== "undefined") {
+		return version.trim();
+	}
+	
+	if (typeof window !== "undefined" && window.ENV && window.ENV.AZURE_API_VERSION) {
+		return window.ENV.AZURE_API_VERSION.trim();
+	}
+	
+	return "2025-03-01-preview"; // Default fallback
+};/**
+ * Gets the Azure OpenAI API key from environment
+ * @returns {string} - The Azure API key
+ */
+export const getAzureApiKey = () => {
+	// eslint-disable-next-line no-undef
+	const apiKey = process.env.AZURE_OPENAI_API_KEY;
+	
+	if (apiKey && typeof apiKey === "string" && apiKey.trim() !== "" && apiKey !== "undefined") {
+		return apiKey.trim();
+	}
+	
+	if (typeof window !== "undefined" && window.ENV && window.ENV.AZURE_OPENAI_API_KEY) {
+		return window.ENV.AZURE_OPENAI_API_KEY.trim();
+	}
+	
+	console.warn("Azure OpenAI API key not found. Please configure it in .env file and rebuild.");
+	return "";
+};
+
+/**
+ * Gets the Azure OpenAI TTS deployment name from environment
+ * @returns {string} - The TTS deployment name
+ */
+export const getAzureTtsDeployment = () => {
+	// eslint-disable-next-line no-undef
+	const deployment = process.env.AZURE_TTS_DEPLOYMENT;
+	
+	if (deployment && typeof deployment === "string" && deployment.trim() !== "" && deployment !== "undefined") {
+		return deployment.trim();
+	}
+	
+	if (typeof window !== "undefined" && window.ENV && window.ENV.AZURE_TTS_DEPLOYMENT) {
+		return window.ENV.AZURE_TTS_DEPLOYMENT.trim();
+	}
+	
+	return "gpt-4o-mini-tts"; // Default fallback - change this to match your deployment name
+};

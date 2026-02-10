@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { IoMic, IoClose, IoCheckmark, IoAdd } from "react-icons/io5";
-import { getApiKey } from "../../../utils/apiKeyEncryption";
+import { getAzureEndpoint, getAzureApiVersion, getAzureApiKey } from "../../../utils/apiKeyEncryption";
 
 /**
  * VoiceInput Component
@@ -54,10 +54,11 @@ const VoiceInput = ({ onTranscript, onError, disabled = false, onStateChange }) 
 	 */
 	const startRecording = async () => {
 		try {
-			// Validate API key before starting
-			const apiKey = getApiKey();
-			if (!apiKey || apiKey.trim() === "") {
-				throw new Error("OpenAI API key not configured. Please check your .env file.");
+			// Validate Azure OpenAI configuration before starting
+			const azureEndpoint = getAzureEndpoint();
+			const azureApiKey = getAzureApiKey();
+			if (!azureEndpoint || !azureApiKey || azureApiKey.trim() === "") {
+				throw new Error("Azure OpenAI configuration not found. Please check your .env file.");
 			}
 
 			// Check if microphone is available
@@ -333,33 +334,37 @@ const VoiceInput = ({ onTranscript, onError, disabled = false, onStateChange }) 
 				type: "audio/webm;codecs=opus",
 			});
 
-			// Get API key
-			const apiKey = getApiKey();
-			if (!apiKey || apiKey.trim() === "") {
-				throw new Error("OpenAI API key not configured. Please check your .env file.");
+			// Get Azure OpenAI configuration
+			const azureEndpoint = getAzureEndpoint();
+			const azureApiVersion = getAzureApiVersion();
+			const azureApiKey = getAzureApiKey();
+			
+			if (!azureEndpoint || !azureApiKey || azureApiKey.trim() === "") {
+				throw new Error("Azure OpenAI configuration not found. Please check your .env file.");
 			}
 
 			// Create FormData
 			const formData = new FormData();
 			formData.append("file", audioFile);
-			formData.append("model", "whisper-1");
-			formData.append("language", "en");
+			formData.append("model", "whisper");
+			formData.append("response_format", "verbose_json");
+			formData.append("language", "en"); // Force English language transcription
 
-			// Send to OpenAI Whisper API with timeout
+			// Build Azure OpenAI transcription URL
+			const transcriptionUrl = `${azureEndpoint}/openai/deployments/whisper/audio/transcriptions?api-version=${azureApiVersion}`;
+
+			// Send to Azure OpenAI API with timeout
 			const controller = new AbortController();
 			const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
-			const response = await fetch(
-				"https://api.openai.com/v1/audio/transcriptions",
-				{
-					method: "POST",
-					headers: {
-						Authorization: `Bearer ${apiKey}`,
-					},
-					body: formData,
-					signal: controller.signal,
-				}
-			);
+			const response = await fetch(transcriptionUrl, {
+				method: "POST",
+				headers: {
+					"Authorization": `Bearer ${azureApiKey}`,
+				},
+				body: formData,
+				signal: controller.signal,
+			});
 
 			clearTimeout(timeoutId);
 
@@ -370,8 +375,8 @@ const VoiceInput = ({ onTranscript, onError, disabled = false, onStateChange }) 
 				if (errorData.error) {
 					if (errorData.error.message) {
 						errorMessage = errorData.error.message;
-					} else if (errorData.error.code === "invalid_api_key") {
-						errorMessage = "Invalid API key. Please check your .env file.";
+					} else if (errorData.error.code === "invalid_api_key" || errorData.error.code === "401") {
+						errorMessage = "Invalid Azure OpenAI API key. Please check your .env file.";
 					} else if (errorData.error.code === "rate_limit_exceeded") {
 						errorMessage = "Rate limit exceeded. Please try again in a moment.";
 					}

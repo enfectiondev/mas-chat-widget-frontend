@@ -28,6 +28,19 @@ module.exports = {
 			"process.env.API_BASE_URL": JSON.stringify(
 				process.env.API_BASE_URL || ""
 			),
+			// Azure OpenAI variables
+			"process.env.AZURE_ENDPOINT": JSON.stringify(
+				process.env.AZURE_ENDPOINT || ""
+			),
+			"process.env.AZURE_API_VERSION": JSON.stringify(
+				process.env.AZURE_API_VERSION || ""
+			),
+			"process.env.AZURE_OPENAI_API_KEY": JSON.stringify(
+				process.env.AZURE_OPENAI_API_KEY || ""
+			),
+			"process.env.AZURE_TTS_DEPLOYMENT": JSON.stringify(
+				process.env.AZURE_TTS_DEPLOYMENT || ""
+			),
 		}),
 	],
 	module: {

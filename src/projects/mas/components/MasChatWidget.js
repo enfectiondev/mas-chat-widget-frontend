@@ -16,10 +16,9 @@ import {
 	IoCheckmark,
 } from "react-icons/io5";
 import ReactMarkdown from "react-markdown";
-import AnimatedChatButton from "./AnimatedChatButton";
 import AnimatedHeaderIcon from "./AnimatedHeaderIcon";
 import VoiceInput from "./VoiceInput";
-import { getApiKey, getApiBaseUrl } from "../../../utils/apiKeyEncryption";
+import { getApiKey, getApiBaseUrl, getAzureEndpoint, getAzureApiVersion, getAzureApiKey, getAzureTtsDeployment } from "../../../utils/apiKeyEncryption";
 import widgetBg from "../../../assets/widget-bg.webp";
 import "../../../styles/mas-chat-widget.scss";
 
@@ -396,31 +395,55 @@ const MasChatWidget = ({ displayMode = "popup" }) => {
 		alert(error); // Simple alert for now - can be replaced with a toast component
 	};
 
-	// Generate audio using OpenAI Text-to-Speech API
+	// Generate audio using Azure OpenAI Text-to-Speech API
 	const generateAudio = async (text, messageId) => {
 		try {
-			const apiKey = getApiKey();
-			if (!apiKey || apiKey.trim() === "") {
-				throw new Error("OpenAI API key not configured. Please check your .env file.");
+			const azureEndpoint = getAzureEndpoint();
+			const azureApiVersion = getAzureApiVersion();
+			const azureApiKey = getAzureApiKey();
+			
+			if (!azureEndpoint || !azureApiKey || azureApiKey.trim() === "") {
+				throw new Error("Azure OpenAI configuration not found. Please check your .env file.");
 			}
 
-			// Call OpenAI TTS API
-			const response = await fetch("https://api.openai.com/v1/audio/speech", {
+			// Get TTS deployment name from environment
+			const ttsDeployment = getAzureTtsDeployment();
+			
+			// Build Azure OpenAI TTS URL
+			const ttsUrl = `${azureEndpoint}/openai/deployments/${ttsDeployment}/audio/speech?api-version=${azureApiVersion}`;
+			
+			console.log("🔊 TTS Request URL:", ttsUrl);
+			console.log("🔊 TTS Deployment:", ttsDeployment);
+			
+			// Call Azure OpenAI TTS API
+			const response = await fetch(ttsUrl, {
 				method: "POST",
 				headers: {
-					"Authorization": `Bearer ${apiKey}`,
+					"Authorization": `Bearer ${azureApiKey}`,
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({
-					model: "tts-1",
-					input: text,
-					voice: "alloy", // Options: alloy, echo, fable, onyx, nova, shimmer
-				}),
+			body: JSON.stringify({
+				model: ttsDeployment, // Model name (same as deployment name)
+				input: text,
+				voice: "onyx", // Options: alloy, echo, fable, onyx, nova, shimmer
+			}),
 			});
 
+			console.log("🔊 TTS Response Status:", response.status, response.statusText);
+
 			if (!response.ok) {
-				const errorData = await response.json().catch(() => ({}));
-				throw new Error(errorData.error?.message || `TTS API error: ${response.status}`);
+				let errorData = {};
+				try {
+					errorData = await response.json();
+				} catch (e) {
+					// If response is not JSON, try to get text
+					const text = await response.text().catch(() => "");
+					console.error("🔊 TTS Error Response (non-JSON):", text);
+					throw new Error(`TTS API error: ${response.status} ${response.statusText}. ${text || "Please check your deployment name."}`);
+				}
+				console.error("🔊 TTS Error Data:", errorData);
+				const errorMessage = errorData.error?.message || errorData.message || `TTS API error: ${response.status} ${response.statusText}`;
+				throw new Error(errorMessage);
 			}
 
 			// Get audio blob
@@ -444,7 +467,12 @@ const MasChatWidget = ({ displayMode = "popup" }) => {
 
 			return audio;
 		} catch (error) {
-			console.error("Error generating audio:", error);
+			console.error("❌ Error generating audio:", error);
+			console.error("❌ Error details:", {
+				message: error.message,
+				stack: error.stack,
+				name: error.name
+			});
 			throw error;
 		}
 	};
@@ -490,9 +518,14 @@ const MasChatWidget = ({ displayMode = "popup" }) => {
 			await audio.play();
 			setPlayingAudioId(messageId);
 		} catch (error) {
-			console.error("Error playing audio:", error);
+			console.error("❌ Error playing audio:", error);
+			console.error("❌ Error details:", {
+				message: error.message,
+				stack: error.stack,
+				name: error.name
+			});
 			setGeneratingAudioId(null); // Clear loading state on error
-			alert(`Failed to play audio: ${error.message}`);
+			alert(`Failed to play audio: ${error.message || "Unknown error. Please check the console for details."}`);
 		}
 	};
 
@@ -589,9 +622,43 @@ const MasChatWidget = ({ displayMode = "popup" }) => {
 
 	return (
 		<div className={`mas-chat-container ${currentMode}`}>
-			{/* Animated Chat Toggle Button */}
+			{/* Animated Chat Toggle Button - Using AnimatedHeaderIcon */}
 			{!isOpen && (
-				<AnimatedChatButton onClick={toggleChat} isVisible={!isOpen} />
+				<div
+					onClick={toggleChat}
+					style={{
+						position: "fixed",
+						bottom: "20px",
+						right: "20px",
+						width: "80px",
+						height: "80px",
+						cursor: "pointer",
+						zIndex: 9998,
+						display: "flex",
+						alignItems: "center",
+						justifyContent: "center",
+						transition: "transform 0.3s ease",
+						background: "none",
+						backgroundColor: "transparent",
+						border: "none",
+						outline: "none",
+					}}
+					onMouseEnter={(e) => {
+						e.currentTarget.style.transform = "scale(1.1)";
+					}}
+					onMouseLeave={(e) => {
+						e.currentTarget.style.transform = "scale(1)";
+					}}
+				>
+					<AnimatedHeaderIcon 
+						size={80} 
+						eyeSize={6} 
+						eyeGap={8} 
+						opacity={1.0}
+						particleSizeMin={0.015}
+						particleSizeMax={0.12}
+					/>
+				</div>
 			)}
 
 			{/* Floating Overlay with Additional Components */}
